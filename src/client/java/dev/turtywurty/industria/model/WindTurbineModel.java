@@ -6,7 +6,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 
-public class WindTurbineModel extends Model {
+public class WindTurbineModel extends Model<Void> {
     public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Industria.id("wind_turbine"), "main");
     public static final Identifier TEXTURE_LOCATION = Industria.id("textures/block/wind_turbine.png");
 

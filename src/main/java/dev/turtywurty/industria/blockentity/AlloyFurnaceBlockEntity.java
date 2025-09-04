@@ -123,7 +123,7 @@ public class AlloyFurnaceBlockEntity extends IndustriaBlockEntity implements Syn
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         if (!this.bufferedStack.isEmpty()) {
@@ -233,7 +233,7 @@ public class AlloyFurnaceBlockEntity extends IndustriaBlockEntity implements Syn
         view.putInt("MaxBurnTime", this.maxBurnTime);
 
         if (this.currentRecipeId != null) {
-            view.put("CurrentRecipe", RECIPE_CODEC, this.currentRecipeId);
+            view.put("CurrentRecipe", Recipe.KEY_CODEC, this.currentRecipeId);
         }
 
         ViewUtils.putChild(view, "Inventory", this.wrappedInventoryStorage);
@@ -248,7 +248,7 @@ public class AlloyFurnaceBlockEntity extends IndustriaBlockEntity implements Syn
         this.maxProgress = view.getInt("MaxProgress", 0);
         this.burnTime = view.getInt("BurnTime", 0);
         this.maxBurnTime = view.getInt("MaxBurnTime", 0);
-        this.currentRecipeId = view.read("CurrentRecipe", RECIPE_CODEC).orElse(null);
+        this.currentRecipeId = view.read("CurrentRecipe", Recipe.KEY_CODEC).orElse(null);
         ViewUtils.readChild(view, "Inventory", this.wrappedInventoryStorage);
         this.bufferedStack = view.read("BufferedStack", ItemStack.CODEC).orElse(ItemStack.EMPTY);
     }

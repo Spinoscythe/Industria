@@ -12,7 +12,6 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class IndustriaBlockEntity extends UpdatableBlockEntity {
-    public static final Codec<RegistryKey<Recipe<?>>> RECIPE_CODEC = RegistryKey.createCodec(RegistryKeys.RECIPE);
     protected final IndustriaBlock blockRef;
 
     public IndustriaBlockEntity(IndustriaBlock blockRef, BlockEntityType<?> type, BlockPos pos, BlockState state) {

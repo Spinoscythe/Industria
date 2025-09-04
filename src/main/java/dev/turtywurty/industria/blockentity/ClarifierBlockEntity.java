@@ -133,7 +133,7 @@ public class ClarifierBlockEntity extends IndustriaBlockEntity implements Syncab
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         if (!this.outputItemStack.isEmpty()) {
@@ -262,7 +262,7 @@ public class ClarifierBlockEntity extends IndustriaBlockEntity implements Syncab
         view.putInt("MaxProgress", this.maxProgress);
 
         if (this.currentRecipeId != null) {
-            view.put("CurrentRecipe", RECIPE_CODEC, this.currentRecipeId);
+            view.put("CurrentRecipe", Recipe.KEY_CODEC, this.currentRecipeId);
         }
 
         if (!this.outputItemStack.isEmpty()) {

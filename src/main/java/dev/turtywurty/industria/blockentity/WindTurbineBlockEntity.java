@@ -88,7 +88,7 @@ public class WindTurbineBlockEntity extends IndustriaBlockEntity implements Sync
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         if (this.windNoise == null) {

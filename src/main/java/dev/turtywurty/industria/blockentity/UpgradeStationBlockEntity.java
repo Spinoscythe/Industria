@@ -203,7 +203,7 @@ public class UpgradeStationBlockEntity extends IndustriaBlockEntity implements B
             view.putString("SelectedRecipe", this.selectedRecipe.getValue().toString());
         }
 
-        var availableRecipes = view.getListAppender("AvailableRecipes", RECIPE_CODEC);
+        var availableRecipes = view.getListAppender("AvailableRecipes", Recipe.KEY_CODEC);
         this.availableRecipes.forEach(availableRecipes::add);
 
         view.putInt("SelectedRecipeIndex", this.selectedRecipeIndex);
@@ -221,7 +221,7 @@ public class UpgradeStationBlockEntity extends IndustriaBlockEntity implements B
         this.selectedRecipe = getRecipeKey(Objects.requireNonNull(view.getString("SelectedRecipe", "")));
 
         this.availableRecipes.clear();
-        for (var recipe : view.getTypedListView("AvailableRecipes", RECIPE_CODEC)) {
+        for (var recipe : view.getTypedListView("AvailableRecipes", Recipe.KEY_CODEC)) {
             this.availableRecipes.add(recipe);
         }
 
@@ -245,7 +245,7 @@ public class UpgradeStationBlockEntity extends IndustriaBlockEntity implements B
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         if (!this.overflowStack.isEmpty()) {
@@ -376,7 +376,7 @@ public class UpgradeStationBlockEntity extends IndustriaBlockEntity implements B
     }
 
     public void setSelectedRecipeIndex(int index) {
-        if (this.world == null || this.world.isClient || index < 0 || index >= this.availableRecipes.size() || this.selectedRecipeIndex == index)
+        if (this.world == null || this.world.isClient() || index < 0 || index >= this.availableRecipes.size() || this.selectedRecipeIndex == index)
             return;
 
         this.selectedRecipeIndex = index;

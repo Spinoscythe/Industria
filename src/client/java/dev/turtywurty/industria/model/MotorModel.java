@@ -6,7 +6,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 
-public class MotorModel extends Model {
+public class MotorModel extends Model<Void> {
     public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Industria.id("motor"), "main");
     public static final Identifier TEXTURE_LOCATION = Industria.id("textures/block/motor.png");
 

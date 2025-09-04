@@ -6,7 +6,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 
-public class DrillFrameModel extends Model {
+public class DrillFrameModel extends Model<Void> {
     public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Industria.id("drill_frame"), "main");
     public static final Identifier TEXTURE_LOCATION = Industria.id("textures/block/drill_frame.png");
 

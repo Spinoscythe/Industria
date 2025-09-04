@@ -5,7 +5,7 @@ import net.minecraft.client.model.*;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 
-public class CrusherModel extends Model {
+public class CrusherModel extends Model<Void> {
     public static final EntityModelLayer LAYER_LOCATION =
             new EntityModelLayer(Industria.id("crusher"), "main");
 

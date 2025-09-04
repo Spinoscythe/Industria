@@ -8,7 +8,7 @@ import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-public class RotaryKilnModel extends Model {
+public class RotaryKilnModel extends Model<Void> {
     public static final Identifier TEXTURE_LOCATION = Industria.id("textures/block/rotary_kiln.png");
     public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Industria.id("rotary_kiln"), "main");
 

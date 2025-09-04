@@ -91,7 +91,7 @@ public class SelectEnumButton<T extends Enum<?> & TraversableEnum<T> & EnumValue
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button, boolean doubleClick) {
         if (isMouseOverSelectionArea(mouseX, mouseY) && this.hoveredLastFrame) {
             int ordinal = getOrdinal((int) mouseX, (int) mouseY);
 
@@ -102,8 +102,7 @@ public class SelectEnumButton<T extends Enum<?> & TraversableEnum<T> & EnumValue
                 return true;
             }
         }
-
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button, doubleClick);
     }
 
     @Override

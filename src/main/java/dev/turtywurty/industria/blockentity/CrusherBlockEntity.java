@@ -106,7 +106,7 @@ public class CrusherBlockEntity extends IndustriaBlockEntity implements Syncable
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         listenForItemEntities();
@@ -282,7 +282,7 @@ public class CrusherBlockEntity extends IndustriaBlockEntity implements Syncable
         view.putInt("Progress", this.progress);
         view.putInt("MaxProgress", this.maxProgress);
         if (this.currentRecipeId != null) {
-            view.put("CurrentRecipe", RECIPE_CODEC, this.currentRecipeId);
+            view.put("CurrentRecipe", Recipe.KEY_CODEC, this.currentRecipeId);
         }
 
         if (hasItemsInBuffer()) {

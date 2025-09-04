@@ -10,7 +10,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 
-public class ElectrolyzerModel extends Model {
+public class ElectrolyzerModel extends Model<Void> {
     public static final Identifier TEXTURE_LOCATION = Industria.id("textures/block/electrolyzer.png");
     public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Industria.id("electrolyzer"), "main");
 

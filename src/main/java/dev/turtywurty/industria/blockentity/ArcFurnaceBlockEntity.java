@@ -136,7 +136,7 @@ public class ArcFurnaceBlockEntity extends IndustriaBlockEntity implements Multi
 
     @Override
     public void onTick() {
-        if (world == null || world.isClient)
+        if (world == null || world.isClient())
             return;
 
 
@@ -207,7 +207,7 @@ public class ArcFurnaceBlockEntity extends IndustriaBlockEntity implements Multi
         view.putInt("MaxProgress", this.maxProgress);
 
         if (this.currentRecipeId != null) {
-            view.put("CurrentRecipeId", RECIPE_CODEC, this.currentRecipeId);
+            view.put("CurrentRecipeId", Recipe.KEY_CODEC, this.currentRecipeId);
         }
 
         ViewUtils.putChild(view, "Inventory", this.wrappedInventoryStorage);
@@ -224,7 +224,7 @@ public class ArcFurnaceBlockEntity extends IndustriaBlockEntity implements Multi
         this.mode = view.read("Mode", Codec.STRING).flatMap(Mode::fromStringOptional).orElse(Mode.SMELTING);
         this.progress = view.getInt("Progress", 0);
         this.maxProgress = view.getInt("MaxProgress", 0);
-        this.currentRecipeId = view.read("CurrentRecipeId", RECIPE_CODEC).orElse(null);
+        this.currentRecipeId = view.read("CurrentRecipeId", Recipe.KEY_CODEC).orElse(null);
 
         ViewUtils.readChild(view, "Inventory", this.wrappedInventoryStorage);
         ViewUtils.readChild(view, "Energy", this.wrappedEnergyStorage);
@@ -275,7 +275,7 @@ public class ArcFurnaceBlockEntity extends IndustriaBlockEntity implements Multi
     }
 
     public void setMode(Mode mode) {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         this.mode = mode;

@@ -10,7 +10,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 
-public class UpgradeStationModel extends Model {
+public class UpgradeStationModel extends Model<Void> {
     public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Industria.id("upgrade_station"), "main");
     public static final Identifier TEXTURE_LOCATION = Industria.id("textures/block/upgrade_station.png");
 

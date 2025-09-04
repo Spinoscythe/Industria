@@ -182,7 +182,7 @@ public class SelectRecipeWidget<T extends Recipe<?>> extends ClickableWidget {
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {}
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button, boolean doubleClick) {
         this.mouseClicked = false;
         if (this.canCraft) {
             int xPos = getX();
@@ -206,7 +206,7 @@ public class SelectRecipeWidget<T extends Recipe<?>> extends ClickableWidget {
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button, doubleClick);
     }
 
     private boolean isValidRecipeIndex(int index) {

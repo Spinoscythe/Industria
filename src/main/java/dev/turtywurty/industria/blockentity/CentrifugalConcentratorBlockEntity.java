@@ -160,7 +160,7 @@ public class CentrifugalConcentratorBlockEntity extends IndustriaBlockEntity imp
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         SyncingSimpleInventory bucketInputInventory = getBucketInputInventory();
@@ -330,7 +330,7 @@ public class CentrifugalConcentratorBlockEntity extends IndustriaBlockEntity imp
         view.putInt("MaxProgress", this.maxProgress);
 
         if (this.currentRecipeId != null) {
-            view.put("CurrentRecipe", RECIPE_CODEC, this.currentRecipeId);
+            view.put("CurrentRecipe", Recipe.KEY_CODEC, this.currentRecipeId);
         }
 
         view.putInt("RecipeRPM", this.recipeRPM);
@@ -355,7 +355,7 @@ public class CentrifugalConcentratorBlockEntity extends IndustriaBlockEntity imp
     protected void readData(ReadView view) {
         this.progress = view.getInt("Progress", 0);
         this.maxProgress = view.getInt("MaxProgress", 0);
-        this.currentRecipeId = view.read("CurrentRecipe", RECIPE_CODEC).orElse(null);
+        this.currentRecipeId = view.read("CurrentRecipe", Recipe.KEY_CODEC).orElse(null);
         this.recipeRPM = view.getInt("RecipeRPM", 0);
         ViewUtils.readChild(view, "Inventory", this.wrappedInventoryStorage);
         ViewUtils.readChild(view, "FluidTank", this.wrappedFluidStorage);

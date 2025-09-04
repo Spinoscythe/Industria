@@ -178,7 +178,7 @@ public class DigesterBlockEntity extends IndustriaBlockEntity implements Syncabl
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         SyncingSimpleInventory bucketInputInventory = getInputSlurryInventory();
@@ -313,7 +313,7 @@ public class DigesterBlockEntity extends IndustriaBlockEntity implements Syncabl
         view.putInt("MaxProgress", this.maxProgress);
 
         if (this.currentRecipeId != null) {
-            view.put("CurrentRecipe", RECIPE_CODEC, this.currentRecipeId);
+            view.put("CurrentRecipe", Recipe.KEY_CODEC, this.currentRecipeId);
         }
     }
 

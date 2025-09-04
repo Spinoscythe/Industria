@@ -5,10 +5,13 @@ import dev.turtywurty.industria.model.MotorModel;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 public class MotorBlockEntityRenderer implements BlockEntityRenderer<MotorBlockEntity> {
     private final BlockEntityRendererFactory.Context context;
@@ -21,7 +24,7 @@ public class MotorBlockEntityRenderer implements BlockEntityRenderer<MotorBlockE
     }
 
     @Override
-    public void render(MotorBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Vec3d cameraPos) {
+    public void render(MotorBlockEntity entity, float tickProgress, MatrixStack matrices, int light, int overlay, Vec3d cameraPos, @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlayCommand, OrderedRenderCommandQueue orderedRenderCommandQueue) {
         matrices.push();
         matrices.translate(0.5, 1.5, 0.5);
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
@@ -34,10 +37,10 @@ public class MotorBlockEntityRenderer implements BlockEntityRenderer<MotorBlockE
         }));
 
         float rotationSpeed = entity.getRotationSpeed();
-        entity.rodRotation += rotationSpeed * tickDelta;
+        entity.rodRotation += rotationSpeed * tickProgress;
 
         this.model.getMotorParts().spinRod().pitch = entity.rodRotation;
-        model.render(matrices, vertexConsumers.getBuffer(model.getLayer(MotorModel.TEXTURE_LOCATION)), light, overlay);
+        orderedRenderCommandQueue.submitModel(model, null, matrices, model.getLayer(MotorModel.TEXTURE_LOCATION), light, overlay, -1, null);
         this.model.getMotorParts().spinRod().pitch = 0;
 
         matrices.pop();

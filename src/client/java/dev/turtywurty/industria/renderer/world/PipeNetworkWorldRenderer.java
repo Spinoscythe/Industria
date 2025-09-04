@@ -70,7 +70,7 @@ public class PipeNetworkWorldRenderer implements IndustriaWorldRenderer {
         if(cameraEntity == null)
             return;
 
-        RegistryKey<World> dimension = cameraEntity.getWorld().getRegistryKey();
+        RegistryKey<World> dimension = cameraEntity.getEntityWorld().getRegistryKey();
         for (PipeNetworkManager<?, ?> manager : ClientPipeNetworks.get(dimension)) {
             TransferType<?, ?, ?> transferType = manager.getTransferType();
             float[] color = COLOR_MAP.get(transferType);
@@ -83,7 +83,7 @@ public class PipeNetworkWorldRenderer implements IndustriaWorldRenderer {
 
                     VertexConsumer vertexConsumer = consumers.getBuffer(RenderLayer.getLines());
                     VertexRendering.drawBox(
-                            matrices,
+                            matrices.peek(),
                             vertexConsumer,
                             new Box(pos, pos).expand(0.25),
                             color[0],

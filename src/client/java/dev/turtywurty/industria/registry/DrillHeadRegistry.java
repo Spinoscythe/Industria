@@ -4,9 +4,11 @@ import com.mojang.datafixers.util.Either;
 import dev.turtywurty.industria.blockentity.DrillBlockEntity;
 import dev.turtywurty.industria.util.DrillHeadable;
 import net.minecraft.client.model.Model;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.model.LoadedEntityModels;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -59,7 +61,7 @@ public class DrillHeadRegistry {
 
         @FunctionalInterface
         public interface RenderFunction {
-            void render(DrillBlockEntity blockEntity, ItemStack headStack, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, Model model, VertexConsumer vertexConsumer, int light, int overlay);
+            void render(DrillBlockEntity blockEntity, ItemStack headStack, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, Model<?> model, RenderLayer renderLayer, int light, int overlay);
         }
     }
 }

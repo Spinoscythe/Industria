@@ -7,11 +7,14 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 public class CrusherBlockEntityRenderer implements BlockEntityRenderer<CrusherBlockEntity> {
     private static final Identifier TEXTURE = Industria.id("textures/block/crusher.png");
@@ -23,7 +26,7 @@ public class CrusherBlockEntityRenderer implements BlockEntityRenderer<CrusherBl
     }
 
     @Override
-    public void render(CrusherBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Vec3d cameraPos) {
+    public void render(CrusherBlockEntity entity, float tickProgress, MatrixStack matrices, int light, int overlay, Vec3d cameraPos, @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlayCommand, OrderedRenderCommandQueue orderedRenderCommandQueue) {
         matrices.push();
         matrices.translate(0.5f, 1.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
@@ -47,8 +50,7 @@ public class CrusherBlockEntityRenderer implements BlockEntityRenderer<CrusherBl
             this.model.getCrusherParts().topRight().roll = entity.getProgress() / 100.0F;
         }
 
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(this.model.getLayer(TEXTURE));
-        this.model.render(matrices, vertexConsumer, light, overlay);
+        orderedRenderCommandQueue.submitModel(this.model, null, matrices, this.model.getLayer(TEXTURE), light, overlay, -1, null);
 
         this.model.getCrusherParts().bottomLeft().roll = prevBottomLeftRoll;
         this.model.getCrusherParts().bottomRight().roll = prevBottomRightRoll;

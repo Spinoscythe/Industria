@@ -4,6 +4,7 @@ import dev.turtywurty.industria.blockentity.FluidTankBlockEntity;
 import dev.turtywurty.industria.util.InWorldFluidRenderingComponent;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class FluidTankBlockEntityRenderer extends IndustriaBlockEntityRenderer<FluidTankBlockEntity> {
@@ -14,11 +15,11 @@ public class FluidTankBlockEntityRenderer extends IndustriaBlockEntityRenderer<F
     }
 
     @Override
-    protected void onRender(FluidTankBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    protected void onRender(FluidTankBlockEntity entity, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
         matrices.push();
         matrices.translate(-0.5, 1.5, 0.5);
         this.fluidRenderingComponent.render(entity.getFluidTank(),
-                vertexConsumers, matrices,
+                queue, matrices,
                 light, overlay,
                 entity.getWorld(), entity.getPos(),
                 3 / 16f, 0, 3 / 16f,

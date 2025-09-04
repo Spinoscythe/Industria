@@ -8,6 +8,7 @@ import dev.turtywurty.industria.util.InWorldFluidRenderingComponent;
 import dev.turtywurty.industria.util.IndeterminateBoolean;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDisplayContext;
@@ -30,7 +31,7 @@ public class ShakingTableBlockEntityRenderer extends IndustriaBlockEntityRendere
     }
 
     @Override
-    protected void onRender(ShakingTableBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    protected void onRender(ShakingTableBlockEntity entity, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
         float shakesPerSecond = entity.getRecipeFrequency();
         int progress = entity.getProgress();
         int maxProgress = entity.getMaxProgress();
@@ -46,38 +47,39 @@ public class ShakingTableBlockEntityRenderer extends IndustriaBlockEntityRendere
             this.model.getModelParts().table().originZ += shakeOffset;
         }
 
-        this.model.render(matrices, vertexConsumers.getBuffer(this.model.getLayer(ShakingTableModel.TEXTURE_LOCATION)), light, overlay);
+        queue.submitModel(model, null, matrices, this.model.getLayer(ShakingTableModel.TEXTURE_LOCATION), light, overlay, -1, null);
         this.model.getModelParts().table().originZ = previousOriginZ;
 
 
-        renderGutterFluids(entity, matrices, vertexConsumers, light, overlay, shakeOffset);
+        renderGutterFluids(entity, matrices, queue, light, overlay, shakeOffset);
 
-        Vec2f fluidEnd = renderSurfaceFluid(entity, matrices, vertexConsumers, light, overlay, shakeOffset);
+        Vec2f fluidEnd = renderSurfaceFluid(entity, matrices, queue, light, overlay, shakeOffset);
 
-        renderItemStacks(entity, matrices, vertexConsumers, light, overlay, shakeOffset, fluidEnd.x, fluidEnd.y);
+        renderItemStacks(entity, matrices, queue, light, overlay, shakeOffset, fluidEnd.x, fluidEnd.y);
     }
 
     @Override
-    protected void postRender(ShakingTableBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        super.postRender(entity, tickDelta, matrices, vertexConsumers, light, overlay);
+    protected void postRender(ShakingTableBlockEntity entity, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
+        super.postRender(entity, tickDelta, matrices, queue, light, overlay);
         if (DebugRenderingRegistry.debugRendering) {
             Box shakeBox = entity.createShakeBox();
             shakeBox = shakeBox.offset(-entity.getPos().getX(), -entity.getPos().getY(), -entity.getPos().getZ());
             if (shakeBox != null) {
-                VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getLines());
+                Box finalShakeBox = shakeBox;
+                queue.submitCustom(matrices, RenderLayer.getLines(), (matricesEntry, vertexConsumer) ->
                 VertexRendering.drawBox(
-                        matrices,
+                        matricesEntry,
                         vertexConsumer,
-                        shakeBox,
+                        finalShakeBox,
                         1.0f, 1.0f, 1.0f, 1.0f
-                );
+                ));
             }
         }
     }
 
     // TODO: Figure out why the items start off centered in the middle of the table
     // and then move to the left side of the table when the shaking starts.
-    private void renderItemStacks(ShakingTableBlockEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, float shakeOffset, float surfaceFluidX, float surfaceFluidY) {
+    private void renderItemStacks(ShakingTableBlockEntity entity, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay, float shakeOffset, float surfaceFluidX, float surfaceFluidY) {
         ItemStack processingStack = entity.getInputInventory().getStackInSlot(0);
         if (processingStack.isEmpty())
             return;
@@ -96,14 +98,15 @@ public class ShakingTableBlockEntityRenderer extends IndustriaBlockEntityRendere
             matrices.translate(x, y, z);
             matrices.scale(0.5f, 0.5f, 0.5f);
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
-            this.context.getItemRenderer().renderItem(
+            this.context.itemRenderer().renderAbove(
+                    null,
                     processingStack,
                     ItemDisplayContext.GROUND,
+                    matrices,
+                    queue,
+                    entity.getWorld(),
                     light,
                     overlay,
-                    matrices,
-                    vertexConsumers,
-                    entity.getWorld(),
                     0
             );
             matrices.pop();
@@ -112,7 +115,7 @@ public class ShakingTableBlockEntityRenderer extends IndustriaBlockEntityRendere
         matrices.pop();
     }
 
-    private Vec2f renderSurfaceFluid(ShakingTableBlockEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, float shakeOffset) {
+    private Vec2f renderSurfaceFluid(ShakingTableBlockEntity entity, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay, float shakeOffset) {
         float progress = entity.getProgress() / (float) entity.getMaxProgress();
 
         if (progress <= 0.0f) return new Vec2f(0, 0);
@@ -132,7 +135,7 @@ public class ShakingTableBlockEntityRenderer extends IndustriaBlockEntityRendere
         matrices.translate(0, 0.0f, shakeOffset / 16f);
 
         this.fluidRenderer.render(entity.getInputFluidTank(),
-                vertexConsumers, matrices,
+                queue, matrices,
                 light, overlay,
                 entity.getWorld(), entity.getPos(),
                 fluidX, -4 / 16f, -2.0f - 2f / 16f,
@@ -146,7 +149,7 @@ public class ShakingTableBlockEntityRenderer extends IndustriaBlockEntityRendere
         return new Vec2f(fluidX, endY);
     }
 
-    private void renderGutterFluids(ShakingTableBlockEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, float shakeOffset) {
+    private void renderGutterFluids(ShakingTableBlockEntity entity, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay, float shakeOffset) {
         matrices.push();
         matrices.translate(0.0f, 0.0f, shakeOffset / 16f);
         {
@@ -156,7 +159,7 @@ public class ShakingTableBlockEntityRenderer extends IndustriaBlockEntityRendere
             float x2 = 1f + 1f / 16f;
             float z2 = -5f / 16f;
             this.fluidRenderer.render(entity.getInputFluidTank(),
-                    vertexConsumers, matrices,
+                    queue, matrices,
                     light, overlay,
                     entity.getWorld(), entity.getPos(),
                     x1, y1, z1, x2, 1.999f, z2,
@@ -171,7 +174,7 @@ public class ShakingTableBlockEntityRenderer extends IndustriaBlockEntityRendere
             float x2 = 1f + 1f / 16f;
             float z2 = 1 + 2f / 16f;
             this.fluidRenderer.render(entity.getInputFluidTank(),
-                    vertexConsumers, matrices,
+                    queue, matrices,
                     light, overlay,
                     entity.getWorld(), entity.getPos(),
                     x1, y1, z1, x2, 1.999f, z2,

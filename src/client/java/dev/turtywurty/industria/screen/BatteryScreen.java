@@ -32,8 +32,8 @@ public class BatteryScreen extends HandledScreen<BatteryScreenHandler> {
         var toggle = addDrawableChild(new ToggleButtonWidget(this.x + 144, this.y + 10, 20, 20,
                 blockEntity.getChargeMode() == BatteryBlockEntity.ChargeMode.CHARGE) {
             @Override
-            public void onClick(double mouseX, double mouseY) {
-                super.onClick(mouseX, mouseY);
+            public void onClick(double mouseX, double mouseY, boolean doubleClick) {
+                super.onClick(mouseX, mouseY, doubleClick);
                 ClientPlayNetworking.send(new BatteryChargeModePayload(BatteryScreen.this.handler.getChargeMode().next()));
             }
         });

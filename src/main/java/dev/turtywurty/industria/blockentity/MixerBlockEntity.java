@@ -204,7 +204,7 @@ public class MixerBlockEntity extends IndustriaBlockEntity implements SyncableTi
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         SyncingSimpleInventory bucketInputInventory = getBucketInputInventory();
@@ -342,7 +342,7 @@ public class MixerBlockEntity extends IndustriaBlockEntity implements SyncableTi
         view.putInt("MaxProgress", this.maxProgress);
         view.putInt("Temperature", this.temperature);
         if (this.currentRecipeId != null) {
-            view.put("CurrentRecipe", RECIPE_CODEC, this.currentRecipeId);
+            view.put("CurrentRecipe", Recipe.KEY_CODEC, this.currentRecipeId);
         }
 
         ViewUtils.putChild(view, "Inventory", this.wrappedInventoryStorage);

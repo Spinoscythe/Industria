@@ -5,10 +5,13 @@ import dev.turtywurty.industria.model.UpgradeStationModel;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 public class UpgradeStationBlockEntityRenderer implements BlockEntityRenderer<UpgradeStationBlockEntity> {
     private final BlockEntityRendererFactory.Context context;
@@ -20,7 +23,7 @@ public class UpgradeStationBlockEntityRenderer implements BlockEntityRenderer<Up
     }
 
     @Override
-    public void render(UpgradeStationBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Vec3d cameraPos) {
+    public void render(UpgradeStationBlockEntity entity, float tickProgress, MatrixStack matrices, int light, int overlay, Vec3d cameraPos, @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlayCommand, OrderedRenderCommandQueue orderedRenderCommandQueue) {
         matrices.push();
         matrices.translate(0.5f, 1.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
@@ -32,7 +35,7 @@ public class UpgradeStationBlockEntityRenderer implements BlockEntityRenderer<Up
             default -> 0;
         }));
 
-        this.model.render(matrices, vertexConsumers.getBuffer(this.model.getLayer(UpgradeStationModel.TEXTURE_LOCATION)), light, overlay);
+        orderedRenderCommandQueue.submitModel(model, null, matrices, this.model.getLayer(UpgradeStationModel.TEXTURE_LOCATION), light, overlay, -1, crumblingOverlayCommand);
 
         matrices.pop();
     }

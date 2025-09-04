@@ -73,7 +73,7 @@ public class RotaryKilnControllerBlockEntity extends IndustriaBlockEntity implem
     }
 
     public static ServerRecipeManager getRecipeManager(World world) {
-        if (world == null || world.isClient)
+        if (world == null || world.isClient())
             return null;
 
         return !(world instanceof ServerWorld serverWorld) ? null : serverWorld.getRecipeManager();
@@ -118,7 +118,7 @@ public class RotaryKilnControllerBlockEntity extends IndustriaBlockEntity implem
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         if (this.ticks++ == 0)
@@ -220,7 +220,7 @@ public class RotaryKilnControllerBlockEntity extends IndustriaBlockEntity implem
 
     @Override
     public List<BlockPos> findPositions(@Nullable Direction facing) {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return List.of();
 
         // 5x5x1 structure
@@ -325,7 +325,7 @@ public class RotaryKilnControllerBlockEntity extends IndustriaBlockEntity implem
     }
 
     public void handleSegmentSearching() {
-        if (world == null || world.isClient)
+        if (world == null || world.isClient())
             return;
 
         Direction facing = getCachedState().get(Properties.HORIZONTAL_FACING);
@@ -366,7 +366,7 @@ public class RotaryKilnControllerBlockEntity extends IndustriaBlockEntity implem
             if (inputRecipeEntry == null)
                 return;
 
-            if (this.world != null && !this.world.isClient) {
+            if (this.world != null && !this.world.isClient()) {
                 ItemScatterer.spawn(this.world, this.pos.getX(), this.pos.getY(), this.pos.getZ(), inputRecipeEntry.inputStack());
             }
 

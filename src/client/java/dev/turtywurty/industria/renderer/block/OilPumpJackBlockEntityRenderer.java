@@ -8,10 +8,13 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 public class OilPumpJackBlockEntityRenderer implements BlockEntityRenderer<OilPumpJackBlockEntity> {
@@ -27,7 +30,7 @@ public class OilPumpJackBlockEntityRenderer implements BlockEntityRenderer<OilPu
     }
 
     @Override
-    public void render(OilPumpJackBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Vec3d cameraPos) {
+    public void render(OilPumpJackBlockEntity entity, float tickProgress, MatrixStack matrices, int light, int overlay, Vec3d cameraPos, @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlayCommand, OrderedRenderCommandQueue orderedRenderCommandQueue) {
         matrices.push();
         matrices.translate(0.5f, 1.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
@@ -41,7 +44,7 @@ public class OilPumpJackBlockEntityRenderer implements BlockEntityRenderer<OilPu
 
         float clientRotation = entity.clientRotation;
         if (entity.isRunning()) {
-            clientRotation = clientRotation + 0.1f * tickDelta;
+            clientRotation = clientRotation + 0.1f * tickProgress;
             if (clientRotation > Math.PI * 2) {
                 clientRotation -= (float) (Math.PI * 2);
                 entity.reverseCounterWeights = !entity.reverseCounterWeights;
@@ -79,10 +82,11 @@ public class OilPumpJackBlockEntityRenderer implements BlockEntityRenderer<OilPu
         calculateArmPitch(attachmentAPosition, attachmentBPosition);
 
         // Draw bridle
-        drawBridle(matrices, vertexConsumers, attachmentBPosition, attachmentCPosition, attachmentDPosition);
+        orderedRenderCommandQueue.submitCustom(matrices, RenderLayer.getLines(), (matricesEntry, vertexConsumer) ->
+                drawBridle(matrices, vertexConsumer, attachmentBPosition, attachmentCPosition, attachmentDPosition)
+        );
 
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(this.model.getLayer(OilPumpJackModel.TEXTURE_LOCATION));
-        this.model.render(matrices, vertexConsumer, light, overlay);
+        orderedRenderCommandQueue.submitModel(model, null, matrices, this.model.getLayer(OilPumpJackModel.TEXTURE_LOCATION), light, overlay, -1, null);
         matrices.pop();
 
         // Reset values
@@ -92,7 +96,7 @@ public class OilPumpJackBlockEntityRenderer implements BlockEntityRenderer<OilPu
         parts.arm().pitch = previousArmPitch;
     }
 
-    private void drawBridle(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Vector3f attachmentBPosition, Vector3f attachmentCPosition, Vector3f attachmentDPosition) {
+    private void drawBridle(MatrixStack matrices, VertexConsumer linesConsumer, Vector3f attachmentBPosition, Vector3f attachmentCPosition, Vector3f attachmentDPosition) {
         matrices.push();
         matrices.translate(0, 1.5f, 0);
 
@@ -100,7 +104,6 @@ public class OilPumpJackBlockEntityRenderer implements BlockEntityRenderer<OilPu
         matrices.translate((attachmentBPosition.x - attachmentCPosition.x) / 16f, (attachmentBPosition.y - attachmentCPosition.y) / 16f, (attachmentBPosition.z - attachmentCPosition.z) / 16f);
         matrices.multiply(RotationAxis.POSITIVE_X.rotation(parts.arm().pitch));
         matrices.translate((attachmentCPosition.x - attachmentBPosition.x) / 16f, (attachmentCPosition.y - attachmentBPosition.y) / 16f, (attachmentCPosition.z - attachmentBPosition.z) / 16f);
-        VertexConsumer linesConsumer = vertexConsumers.getBuffer(RenderLayer.getLines());
         linesConsumer.vertex(matrices.peek(), attachmentCPosition.x, attachmentCPosition.y, attachmentCPosition.z)
                 .color(20, 20, 20, 255)
                 .normal(0, 0, 0);

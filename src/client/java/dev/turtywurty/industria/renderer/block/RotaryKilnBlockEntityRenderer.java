@@ -7,6 +7,7 @@ import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemDisplayContext;
@@ -45,14 +46,12 @@ public class RotaryKilnBlockEntityRenderer extends IndustriaBlockEntityRenderer<
     }
 
     @Override
-    protected void onRender(RotaryKilnControllerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(this.model.getLayer(RotaryKilnModel.TEXTURE_LOCATION));
-        this.model.renderSegment(0, matrices, vertexConsumer, light, overlay);
-
+    protected void onRender(RotaryKilnControllerBlockEntity entity, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
+        queue.submitModelPart(this.model.getRootPart().getChild("seg" + 0), matrices, this.model.getLayer(RotaryKilnModel.TEXTURE_LOCATION), light, overlay, null);
         if (entity.getWorld() == null || entity.getKilnSegments().isEmpty())
             return;
 
-        this.model.renderSegment(1, matrices, vertexConsumer, light, overlay);
+        queue.submitModelPart(this.model.getRootPart().getChild("seg" + 1), matrices, this.model.getLayer(RotaryKilnModel.TEXTURE_LOCATION), light, overlay, null);
 
         RendererData rendererData = BLOCK_POS_RENDERER_DATA_MAP.computeIfAbsent(entity.getPos(), pos -> new RendererData());
 
@@ -62,15 +61,15 @@ public class RotaryKilnBlockEntityRenderer extends IndustriaBlockEntityRenderer<
 
             ModelPart rotatingSegment = this.model.getRotatingSegment(segmentIndex);
             rotatingSegment.roll = rendererData.barrelBody.getAngle() + (float) Math.PI / 8f;
-            this.model.renderSegment(segmentIndex, matrices, vertexConsumer, light, overlay);
+            queue.submitModelPart(this.model.getRootPart().getChild("seg" + segmentIndex), matrices, this.model.getLayer(RotaryKilnModel.TEXTURE_LOCATION), light, overlay, null);
             rotatingSegment.roll = 0;
         }
 
         matrices.translate(0, -1, 0);
-        renderItems(rendererData, entity, tickDelta, matrices, vertexConsumers, light, overlay);
+        renderItems(rendererData, entity, tickDelta, matrices, queue, light, overlay);
     }
 
-    private void renderItems(RendererData rendererData, RotaryKilnControllerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    private void renderItems(RendererData rendererData, RotaryKilnControllerBlockEntity entity, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
         Map<InputRecipeEntry, Body> recipeToBodyMap = rendererData.recipeToBodyMap;
 
         World box2dWorld = rendererData.box2dWorld;
@@ -105,7 +104,7 @@ public class RotaryKilnBlockEntityRenderer extends IndustriaBlockEntityRenderer<
             matrices.scale(0.5f, 0.5f, 0.5f);
             matrices.multiply(Direction.WEST.getRotationQuaternion());
             matrices.multiply(RotationAxis.POSITIVE_X.rotation(body.getAngle()));
-            this.context.getItemRenderer().renderItem(itemStack, ItemDisplayContext.NONE, light, overlay, matrices, vertexConsumers, entity.getWorld(), 0);
+            this.context.itemRenderer().renderAbove(null, itemStack, ItemDisplayContext.NONE, matrices, queue, entity.getWorld(), light, overlay, 0);
             matrices.pop();
         }
     }

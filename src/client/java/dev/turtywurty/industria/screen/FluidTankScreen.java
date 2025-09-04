@@ -36,8 +36,8 @@ public class FluidTankScreen extends HandledScreen<FluidTankScreenHandler> {
 
         this.toggleButton = addDrawableChild(new ToggleButtonWidget(this.x + 8, this.y + 14, 20, 20, this.handler.getBlockEntity().isExtractMode()) {
             @Override
-            public boolean mouseClicked(double mouseX, double mouseY, int button) {
-                boolean mouseClicked = super.mouseClicked(mouseX, mouseY, button);
+            public boolean mouseClicked(double mouseX, double mouseY, int button, boolean doubleClick) {
+                boolean mouseClicked = super.mouseClicked(mouseX, mouseY, button, doubleClick);
                 if(mouseClicked) {
                     this.toggled = !this.toggled;
                 }
@@ -46,8 +46,8 @@ public class FluidTankScreen extends HandledScreen<FluidTankScreenHandler> {
             }
 
             @Override
-            public void onClick(double mouseX, double mouseY) {
-                super.onClick(mouseX, mouseY);
+            public void onClick(double mouseX, double mouseY, boolean bl) {
+                super.onClick(mouseX, mouseY, bl);
                 ClientPlayNetworking.send(new FluidTankChangeExtractModePayload(!this.toggled));
             }
 

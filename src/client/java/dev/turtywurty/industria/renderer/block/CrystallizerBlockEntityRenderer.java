@@ -6,6 +6,7 @@ import dev.turtywurty.industria.util.ColorMode;
 import dev.turtywurty.industria.util.InWorldFluidRenderingComponent;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
@@ -66,14 +67,14 @@ public class CrystallizerBlockEntityRenderer extends IndustriaBlockEntityRendere
     }
 
     @Override
-    protected void onRender(CrystallizerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        this.model.render(matrices, vertexConsumers.getBuffer(this.model.getLayer(CrystallizerModel.TEXTURE_LOCATION)), light, overlay);
+    protected void onRender(CrystallizerBlockEntity entity, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
+        queue.submitModel(model, null, matrices, this.model.getLayer(CrystallizerModel.TEXTURE_LOCATION), light, overlay, -1, null);
 
-        renderNextOutputItem(entity, matrices, vertexConsumers, light, overlay);
-        renderFluids(entity, matrices, vertexConsumers, light, overlay);
+        renderNextOutputItem(entity, matrices, queue, light, overlay);
+        renderFluids(entity, matrices, queue, light, overlay);
     }
 
-    private void renderNextOutputItem(CrystallizerBlockEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    private void renderNextOutputItem(CrystallizerBlockEntity entity, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
         ItemStack itemStack = entity.getNextOutputItemStack();
         if (itemStack.isEmpty())
             return;
@@ -91,23 +92,23 @@ public class CrystallizerBlockEntityRenderer extends IndustriaBlockEntityRendere
             matrices.scale(scale, scale, scale);
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) ((i + 1) * 360) / count));
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
-            this.context.getItemRenderer().renderItem(itemStack, ItemDisplayContext.NONE, light, overlay, matrices, vertexConsumers, entity.getWorld(), 0);
+            this.context.itemRenderer().renderAbove(null, itemStack, ItemDisplayContext.NONE, matrices, queue, entity.getWorld(), light, overlay, 0);
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90));
-            this.context.getItemRenderer().renderItem(itemStack, ItemDisplayContext.NONE, light, overlay, matrices, vertexConsumers, entity.getWorld(), 0);
+            this.context.itemRenderer().renderAbove(null, itemStack, ItemDisplayContext.NONE, matrices, queue, entity.getWorld(), light, overlay, 0);
             matrices.pop();
         }
     }
 
-    private void renderFluids(CrystallizerBlockEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    private void renderFluids(CrystallizerBlockEntity entity, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
         this.fluidRenderer.render(entity.getCrystalFluidStorage(),
-                vertexConsumers, matrices,
+                queue, matrices,
                 light, overlay,
                 entity.getWorld(), entity.getPos(),
                 -18f/16f, -0.5001f, -18f/16f,
                 18f/16f, 46f, 18f/16f - 0.001f, 0x40000000, ColorMode.SUBTRACTION);
 
         this.fluidRenderer.render(entity.getWaterFluidStorage(),
-                vertexConsumers, matrices,
+                queue, matrices,
                 light, overlay,
                 entity.getWorld(), entity.getPos(),
                 -18f/16f, -0.5f, -18f/16f,

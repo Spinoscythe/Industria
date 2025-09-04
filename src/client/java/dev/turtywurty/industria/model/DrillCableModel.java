@@ -6,7 +6,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 
-public class DrillCableModel extends Model {
+public class DrillCableModel extends Model<Void> {
     public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Industria.id("drill_cable"), "main");
     public static final Identifier TEXTURE_LOCATION = Industria.id("textures/block/drill_cable.png");
 

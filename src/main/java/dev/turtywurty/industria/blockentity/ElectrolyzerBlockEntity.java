@@ -201,7 +201,7 @@ public class ElectrolyzerBlockEntity extends IndustriaBlockEntity implements Syn
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         processOutputs();
@@ -375,7 +375,7 @@ public class ElectrolyzerBlockEntity extends IndustriaBlockEntity implements Syn
         view.putInt("MaxProgress", this.maxProgress);
 
         if (this.currentRecipeId != null) {
-            view.put("CurrentRecipe", RECIPE_CODEC, this.currentRecipeId);
+            view.put("CurrentRecipe", Recipe.KEY_CODEC, this.currentRecipeId);
         }
 
         if (!this.leftoverOutputFluid.isEmpty()) {

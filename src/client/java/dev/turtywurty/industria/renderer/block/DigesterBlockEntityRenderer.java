@@ -4,6 +4,7 @@ import dev.turtywurty.industria.blockentity.DigesterBlockEntity;
 import dev.turtywurty.industria.model.DigesterModel;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class DigesterBlockEntityRenderer extends IndustriaBlockEntityRenderer<DigesterBlockEntity> {
@@ -16,7 +17,7 @@ public class DigesterBlockEntityRenderer extends IndustriaBlockEntityRenderer<Di
     }
 
     @Override
-    protected void onRender(DigesterBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        this.model.getRootPart().render(matrices, vertexConsumers.getBuffer(this.model.getLayer(DigesterModel.TEXTURE_LOCATION)), light, overlay);
+    protected void onRender(DigesterBlockEntity entity, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
+        queue.submitModelPart(this.model.getRootPart(), matrices, this.model.getLayer(DigesterModel.TEXTURE_LOCATION), light, overlay, null);
     }
 }

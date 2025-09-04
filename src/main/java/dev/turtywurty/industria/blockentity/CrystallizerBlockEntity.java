@@ -165,7 +165,7 @@ public class CrystallizerBlockEntity extends IndustriaBlockEntity implements Syn
 
     @Override
     public void onTick() {
-        if (this.world == null || this.world.isClient)
+        if (this.world == null || this.world.isClient())
             return;
 
         if (!this.outputItemStack.isEmpty()) {
@@ -286,7 +286,7 @@ public class CrystallizerBlockEntity extends IndustriaBlockEntity implements Syn
         view.putInt("MaxProgress", this.maxProgress);
 
         if (this.currentRecipeId != null) {
-            view.put("CurrentRecipe", RECIPE_CODEC, this.currentRecipeId);
+            view.put("CurrentRecipe", Recipe.KEY_CODEC, this.currentRecipeId);
         }
 
         if (!this.outputItemStack.isEmpty()) {
@@ -313,7 +313,7 @@ public class CrystallizerBlockEntity extends IndustriaBlockEntity implements Syn
         this.progress = view.getInt("Progress", 0);
         this.maxProgress = view.getInt("MaxProgress", 0);
 
-        this.currentRecipeId = view.read("CurrentRecipe", RECIPE_CODEC)
+        this.currentRecipeId = view.read("CurrentRecipe", Recipe.KEY_CODEC)
                 .orElse(null);
 
         this.outputItemStack = view.read("OutputStack", ItemStack.CODEC)

@@ -7,6 +7,7 @@ import dev.turtywurty.industria.util.ColorMode;
 import dev.turtywurty.industria.util.InWorldFluidRenderingComponent;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
@@ -25,9 +26,9 @@ public class MixerBlockEntityRenderer extends IndustriaBlockEntityRenderer<Mixer
     }
 
     @Override
-    protected void onRender(MixerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    protected void onRender(MixerBlockEntity entity, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay) {
         this.model.getMixerParts().stirring_rods().yaw = entity.stirringRotation;
-        this.model.getMixerParts().main().render(matrices, vertexConsumers.getBuffer(this.model.getLayer(MixerModel.TEXTURE_LOCATION)), light, overlay);
+        queue.submitModelPart(this.model.getMixerParts().main(), matrices, this.model.getLayer(MixerModel.TEXTURE_LOCATION), light, overlay, null);
         this.model.getMixerParts().stirring_rods().yaw = 0.0F;
 
         boolean isMixing = entity.isMixing();
@@ -84,14 +85,14 @@ public class MixerBlockEntityRenderer extends IndustriaBlockEntityRenderer<Mixer
                     matrices.multiply(RotationAxis.POSITIVE_Z.rotation(entity.getWorld().getTime() * 0.25f));
                 }
 
-                this.context.getItemRenderer().renderItem(stack, ItemDisplayContext.FIXED, light, overlay, matrices, vertexConsumers, entity.getWorld(), 0);
+                this.context.itemRenderer().renderAbove(null, stack, ItemDisplayContext.FIXED, matrices, queue, entity.getWorld(), light, overlay, 0);
                 matrices.pop();
             }
         }
 
         // TODO: Temperature-based color
         this.fluidRenderer.render(entity.getInputFluidTank(),
-                vertexConsumers, matrices,
+                queue, matrices,
                 light, overlay,
                 entity.getWorld(), entity.getPos(),
                 x1, y1, z1,

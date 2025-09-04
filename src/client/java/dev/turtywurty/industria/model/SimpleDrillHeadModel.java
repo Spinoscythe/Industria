@@ -7,11 +7,12 @@ import net.minecraft.client.model.*;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
-public class SimpleDrillHeadModel extends Model {
+public class SimpleDrillHeadModel extends Model<Void> {
     public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Industria.id("simple_drill_head"), "main");
 
     private final DrillHeadParts parts;
@@ -52,13 +53,13 @@ public class SimpleDrillHeadModel extends Model {
         return TexturedModelData.of(modelData, 128, 128);
     }
 
-    public static void onRender(DrillBlockEntity blockEntity, ItemStack headStack, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, Model pModel, VertexConsumer vertexConsumer, int light, int overlay) {
-        SimpleDrillHeadModel model = (SimpleDrillHeadModel) pModel;
+    public static void onRender(DrillBlockEntity blockEntity, ItemStack headStack, float tickDelta, MatrixStack matrices, OrderedRenderCommandQueue queue, Model<?> model, RenderLayer renderLayer, int light, int overlay) {
+        SimpleDrillHeadModel pModel = (SimpleDrillHeadModel) model;
         Object renderData = blockEntity.getRenderData();
         if(!(renderData instanceof DrillRenderData rotationData))
             return;
 
-        DrillHeadParts parts = model.getDrillHeadParts();
+        DrillHeadParts parts = pModel.getDrillHeadParts();
         float previousClockwiseYaw = parts.clockwise().yaw;
         float previousCounterClockwiseYaw = parts.counterClockwise().yaw;
 
@@ -72,7 +73,7 @@ public class SimpleDrillHeadModel extends Model {
 
         matrices.push();
         matrices.scale(0.9F, 0.9F, 0.9F);
-        model.render(matrices, vertexConsumer, light, overlay);
+        queue.submitModel(model, null, matrices, renderLayer, light, overlay, -1, null);
         matrices.pop();
 
         parts.clockwise().yaw = previousClockwiseYaw;

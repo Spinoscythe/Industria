@@ -172,8 +172,8 @@ public class IndustriaBlock extends Block implements BlockEntityProvider {
     }
 
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        return this.hasComparatorOutput ? this.comparatorOutput.apply(state, world, pos) : super.getComparatorOutput(state, world, pos);
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+        return this.hasComparatorOutput ? this.comparatorOutput.apply(state, world, pos) : super.getComparatorOutput(state, world, pos, direction);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class IndustriaBlock extends Block implements BlockEntityProvider {
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (this.multiblockType != null) {
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 this.multiblockType.onPrimaryBlockUse(world, player, hit, pos);
             }
 
@@ -197,7 +197,7 @@ public class IndustriaBlock extends Block implements BlockEntityProvider {
         }
 
         if (this.rightClickToOpenGui) {
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 BlockEntity blockEntity = world.getBlockEntity(pos);
                 if (player instanceof ServerPlayerEntity sPlayer && blockEntity instanceof BlockEntityWithGui<?> blockEntityWithGui) { // TODO: Replace with component access maybe?
                     sPlayer.openHandledScreen(blockEntityWithGui);
@@ -213,7 +213,7 @@ public class IndustriaBlock extends Block implements BlockEntityProvider {
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         if (this.multiblockType != null) {
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 BlockEntity blockEntity = world.getBlockEntity(pos);
                 if (blockEntity instanceof Multiblockable multiblockable) {
                     multiblockable.buildMultiblock(world, pos, state, placer, itemStack, blockEntity::markDirty);

@@ -8,14 +8,12 @@ import dev.turtywurty.industria.util.DrillHeadable;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.Model;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.model.LoadedEntityModels;
 import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import org.jetbrains.annotations.Nullable;
@@ -28,11 +26,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class DrillHeadItemRenderer implements SpecialModelRenderer<DrillHeadItemRenderer.DrillHeadItemRenderData>, IdentifiableResourceReloadListener {
-    private final Map<DrillHeadable, Model> drillHeadModels = new HashMap<>();
+    private final Map<DrillHeadable, Model<?>> drillHeadModels = new HashMap<>();
     private final Map<DrillHeadable, Identifier> drillHeadTextures = new HashMap<>();
 
     @Override
-    public void render(DrillHeadItemRenderData data, ItemDisplayContext displayContext, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, boolean glint) {
+    public void render(@Nullable DrillHeadItemRenderer.DrillHeadItemRenderData data, ItemDisplayContext displayContext, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay, boolean glint) {
         if(data == null)
             return;
 
@@ -41,13 +39,13 @@ public class DrillHeadItemRenderer implements SpecialModelRenderer<DrillHeadItem
             LoadedEntityModels loadedEntityModels = MinecraftClient.getInstance().getLoadedEntityModels();
             DrillHeadRegistry.DrillHeadClientData clientData = DrillHeadRegistry.getClientData(drillHeadable);
             if (clientData != null && clientData.renderDynamicItem()) {
-                Model model = this.drillHeadModels.computeIfAbsent(drillHeadable, ignored -> clientData.modelResolver().apply(Either.right(loadedEntityModels)));
+                Model<?> model = this.drillHeadModels.computeIfAbsent(drillHeadable, ignored -> clientData.modelResolver().apply(Either.right(loadedEntityModels)));
                 Identifier textureLocation = this.drillHeadTextures.computeIfAbsent(drillHeadable, ignored -> clientData.textureLocation());
                 matrices.push();
                 matrices.translate(0.5f, 0.75f, 0.5f);
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
                 matrices.scale(0.5F, 0.5F, 0.5F);
-                model.render(matrices, vertexConsumers.getBuffer(model.getLayer(textureLocation)), light, overlay);
+                queue.submitModel(model, null, matrices, model.getLayer(textureLocation), light, overlay, -1, null);
                 matrices.pop();
             }
         }
@@ -60,7 +58,7 @@ public class DrillHeadItemRenderer implements SpecialModelRenderer<DrillHeadItem
     }
 
     @Override
-    public CompletableFuture<Void> reload(ResourceReloader.Synchronizer synchronizer, ResourceManager manager, Executor prepareExecutor, Executor applyExecutor) {
+    public CompletableFuture<Void> reload(Store store, Executor prepareExecutor, Synchronizer reloadSynchronizer, Executor applyExecutor) {
         return CompletableFuture.runAsync(() -> {
             this.drillHeadModels.clear();
             this.drillHeadTextures.clear();
@@ -85,7 +83,7 @@ public class DrillHeadItemRenderer implements SpecialModelRenderer<DrillHeadItem
         public static final MapCodec<Unbaked> CODEC = MapCodec.unit(new DrillHeadItemRenderer.Unbaked());
 
         @Override
-        public SpecialModelRenderer<?> bake(LoadedEntityModels entityModels) {
+        public SpecialModelRenderer<?> bake(BakeContext context) {
             return new DrillHeadItemRenderer();
         }
 
